@@ -23,18 +23,18 @@ var gScriptResult;
 var originalUnit = preferences.rulerUnits;
 preferences.rulerUnits = Units.MM;
 // Create a new 2x4 inch document and assign it to a variable
-var docRef = app.documents.add( 200, 400 );
-// Create a new art layer containing text
-var artLayerRef = docRef.artLayers.add();
+// var docRef = app.documents.add( 200, 400 );
+// // Create a new art layer containing text
+// var artLayerRef = docRef.artLayers.add();
 
 // app.foregroundColor = '000000';
 
-// var eyeDistanceEachOther = prompt("Jaka jest odległość między oczkami w milimetrach?", 12, "Processing "+app.activeDocument.activeLayer.name);
+var eyeDistanceEachOther = prompt("Jaka jest odległość między oczkami w milimetrach?", 300, "Processing "+app.activeDocument.activeLayer.name);
 // var eyeDistanceFromEdge = prompt("What is a distance from the edge of a document", 12, "Processing "+app.activeDocument.activeLayer.name);
-// var eyeSize = prompt("What is a diameter?", 12, "Processing "+app.activeDocument.activeLayer.name);
+var eyeSize = prompt("Jaki jest promień oczka w milimetrach?", 12, "Processing "+app.activeDocument.activeLayer.name);
 
-var eyeDistanceEachOther = 50;
-var eyeSize = 5;
+// var eyeDistanceEachOther = 50;
+// var eyeSize = 5;
 
 var _w_Amount = Math.round(app.activeDocument.width / eyeDistanceEachOther);
 var _h_Amount = Math.round(app.activeDocument.height / eyeDistanceEachOther);
@@ -84,6 +84,65 @@ for (i = 1; i < CirclesBottom.length; i++) {
 		CirclesBottom[i].translate(roundedDistanceW*i, 0);
 	}
 }
+
+//create left circles
+var CirclesLeft= [];
+
+for (var i = 0; i < _h_Amount+1; i++){
+	CirclesLeft.push(new Ellipse(0-eyeSize/2, 0-eyeSize/2, eyeSize, eyeSize));
+}
+
+CirclesLeft[0].translate(eyeDistanceFromEdge, eyeDistanceFromEdge);
+
+for (i = 1; i < CirclesLeft.length; i++) {
+	if (i==1) {
+		CirclesLeft[i].translate(eyeDistanceFromEdge, eyeDistanceFromEdge);
+		CirclesLeft[i].translate(0,roundedDistanceH);
+
+	} else {
+		CirclesLeft[i].translate(eyeDistanceFromEdge, eyeDistanceFromEdge);
+		CirclesLeft[i].translate(0,roundedDistanceH*i);
+	}
+}
+
+//create right circles
+var CirclesRight = [];
+
+for (var i = 0; i < _h_Amount+1; i++){
+	CirclesRight.push(new Ellipse(0-eyeSize/2, 0-eyeSize/2, eyeSize, eyeSize));
+}
+
+CirclesRight[0].translate(app.activeDocument.width-eyeDistanceFromEdge, eyeDistanceFromEdge);
+
+for (i = 1; i < CirclesRight.length; i++) {
+	if (i==1) {
+		CirclesRight[i].translate(app.activeDocument.width-eyeDistanceFromEdge, eyeDistanceFromEdge);
+		CirclesRight[i].translate(0,roundedDistanceH);
+
+	} else {
+		CirclesRight[i].translate(app.activeDocument.width-eyeDistanceFromEdge, eyeDistanceFromEdge);
+		CirclesRight[i].translate(0,roundedDistanceH*i);
+	}
+}
+
+//change color
+// for (var i = 0; i < CirclesRight.length; i++) {
+// 	CirclesRight[i].setColor('000000');
+// }
+//
+// for (var i = 0; i < CirclesLeft.length; i++) {
+// 	CirclesLeft[i].setColor('000000');
+// }
+//
+// for (var i = 0; i < CirclesBottom.length; i++) {
+// 	CirclesBottom[i].setColor('000000');
+// }
+//
+// for (var i = 0; i < CirclesTop.length; i++) {
+// 	CirclesTop[i].setColor('000000');
+// }
+
+
 
 // circle.setColor('FF0000')
 // circle.setColor(app.foregroundColor)
