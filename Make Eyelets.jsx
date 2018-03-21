@@ -21,7 +21,7 @@ var gScriptResult;
 // Remember current unit settings and then set units to
 // the value expected by this script
 var originalUnit = preferences.rulerUnits;
-preferences.rulerUnits = Units.MM;
+preferences.rulerUnits = Units.CM;
 // Create a new 2x4 inch document and assign it to a variable
 // var docRef = app.documents.add( 200, 400 );
 // // Create a new art layer containing text
@@ -29,22 +29,49 @@ preferences.rulerUnits = Units.MM;
 
 // app.foregroundColor = '000000';
 
-var eyeDistanceEachOther = prompt("Jaka jest odległość między oczkami w milimetrach?", 300, "Processing "+app.activeDocument.activeLayer.name);
-// var eyeDistanceFromEdge = prompt("What is a distance from the edge of a document", 12, "Processing "+app.activeDocument.activeLayer.name);
-var eyeSize = prompt("Jaki jest promień oczka w milimetrach?", 12, "Processing "+app.activeDocument.activeLayer.name);
+// create a color of your choice
+// var BGcolor = new SolidColor();
+// BGcolor.rgb.red = 0;
+// BGcolor.rgb.green = 0;
+// BGcolor.rgb.blue = 0;
+//
+// // set your color as background color
+// foregroundColor.rgb.hexValue = BGcolor.rgb.hexValue;
 
+// var checkMB = groupTwo.add("checkbox", undefined, "Motion Blur ON");
+// i.e. if (checkMB.value == true)
+
+var eyeDistanceEachOther = prompt("Wpisz odległość między oczkami w centymetrach.", 30, "Przetwarzanie "+app.activeDocument.activeLayer.name);
+// var eyeDistanceFromEdge = prompt("What is a distance from the edge of a document", 12, "Processing "+app.activeDocument.activeLayer.name);
+// var eyeSize = prompt("Jaki jest promień oczka w milimetrach?", 12, "Processing "+app.activeDocument.activeLayer.name);
+// var eyeDistanceEachOther = 30;
 // var eyeDistanceEachOther = 50;
-// var eyeSize = 5;
+
+//converting dpi in inches to centimeters ratio  - 1 inch = 2.54 centimeters
+var eyeMultiplicator =  app.activeDocument.resolution/2.54
+var eyeSize = 0.7  * eyeMultiplicator;
 
 var _w_Amount = Math.round(app.activeDocument.width / eyeDistanceEachOther);
 var _h_Amount = Math.round(app.activeDocument.height / eyeDistanceEachOther);
 
-var eyeDistanceFromEdge = 15;
-var N_eyeDistanceFromEdge = -15;
+var eyeDistanceFromEdge = 1.5;
+var N_eyeDistanceFromEdge = -1.5;
 var diffW = app.activeDocument.width - eyeDistanceFromEdge - eyeDistanceFromEdge;
 var roundedDistanceW = diffW / _w_Amount;
 var diffH = app.activeDocument.height - eyeDistanceFromEdge - eyeDistanceFromEdge;
 var roundedDistanceH= diffH / _h_Amount;
+
+function makeEyelets (top, bottom, left, right) {
+	if (top==true) {
+
+	} else if (bottom==true) {
+
+	} else if (left==true) {
+
+	} else if (right==true){
+
+	}
+}
 
 //create top circles
 var CirclesTop = [];
@@ -124,6 +151,16 @@ for (i = 1; i < CirclesRight.length; i++) {
 		CirclesRight[i].translate(0,roundedDistanceH*i);
 	}
 }
+//
+// var startRulerUnits = app.preferences.rulerUnits;
+// app.preferences.rulerUnits = Units.PIXELS;
+// var bounds = activeDocument.activeLayer.bounds;
+// var width = bounds[2].value - bounds[0].value;
+// var height = bounds[3].value - bounds[1].value;
+// var newWidth = (100 / width) * 300;
+// var newHeight = (100 / height) * 300;
+// activeDocument.activeLayer.resize(newWidth, newHeight, AnchorPosition.MIDDLECENTER);
+// app.preferences.rulerUnits = startRulerUnits;
 
 //change color
 // for (var i = 0; i < CirclesRight.length; i++) {
@@ -156,7 +193,7 @@ docRef = null;
 artLayerRef = null;
 textItemRef = null;
 // Restore original ruler unit setting
-app.preferences.rulerUnits = originalUnit;
+// app.preferences.rulerUnits = originalUnit;
 
 
 // try {
