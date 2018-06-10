@@ -210,7 +210,6 @@ function endoEyelets() {
     app.backgroundColor.cmyk =  greyWeldColorObj;
     app.activeDocument.resizeCanvas(app.activeDocument.width.value+6, app.activeDocument.height.value, AnchorPosition.MIDDLECENTER);
     app.backgroundColor.cmyk =  whiteColorObj;
-    frame();
   }
 
   var eyes = [];
@@ -340,7 +339,6 @@ function CreateEyelets (eyeDistanceEachOther, up, down, left, right, eyeDistance
       app.backgroundColor.cmyk =  greyWeldColorObj;
       app.activeDocument.resizeCanvas(app.activeDocument.width.value + (weldGlobalGrey * 2), app.activeDocument.height.value + (weldGlobalGrey * 2), AnchorPosition.MIDDLECENTER);
       app.backgroundColor.cmyk =  whiteColorObj;
-      frame();
     }
 
     //converting dpi in inches to centimeters ratio  - 1 inch = 2.54 centimeters
