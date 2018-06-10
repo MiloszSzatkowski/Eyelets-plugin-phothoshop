@@ -331,12 +331,12 @@ function CreateEyelets (eyeDistanceEachOther, up, down, left, right, eyeDistance
     // alert( weldGlobalWhite + weldGlobalGrey )
 
     //zgrzew | weld
-    if (weldGlobalWhite !== 0) {
+    if (weldGlobalWhite > 1) {
       frame();
       app.backgroundColor.cmyk =  whiteColorObj;
       app.activeDocument.resizeCanvas(app.activeDocument.width.value + (weldGlobalWhite * 2), app.activeDocument.height.value + (weldGlobalWhite * 2), AnchorPosition.MIDDLECENTER);
       frame();
-    } else if (weldGlobalGrey !== 0){
+    } else if (weldGlobalGrey > 1){
       app.backgroundColor.cmyk =  greyWeldColorObj;
       app.activeDocument.resizeCanvas(app.activeDocument.width.value + (weldGlobalGrey * 2), app.activeDocument.height.value + (weldGlobalGrey * 2), AnchorPosition.MIDDLECENTER);
       app.backgroundColor.cmyk =  whiteColorObj;
