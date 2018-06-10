@@ -121,8 +121,34 @@ win.closeGroup.cancelButton.onClick = function() {
 
 win.closeGroup.applyButton.onClick = startApp;
 
+//zgrzew
+win.sliderPanel.add ("statictext", undefined, 'zgrzew bialy | white weld');
+var weldGlobalWhite = win.sliderPanel.add ("edittext", undefined, 0);
+win.sliderPanel.add ("statictext", undefined, 'zgrzew szary | grey weld');
+var weldGlobalGrey = win.sliderPanel.add ("edittext", undefined, 0);
+
+function weld() {
+      // alert( weldGlobalWhiteVal + weldGlobalGreyVal );
+      //zgrzew | weld
+      if (weldGlobalWhiteVal !== 0 && weldGlobalWhiteVal > 0.1) {
+        frame();
+        app.backgroundColor.cmyk =  whiteColorObj;
+        app.activeDocument.resizeCanvas(app.activeDocument.width.value + (weldGlobalWhiteVal * 2), app.activeDocument.height.value + (weldGlobalWhiteVal * 2), AnchorPosition.MIDDLECENTER);
+        frame();
+      } else if (weldGlobalGreyVal !== 0 && weldGlobalGreyVal > 0.1){
+        app.backgroundColor.cmyk =  greyWeldColorObj;
+        app.activeDocument.resizeCanvas(app.activeDocument.width.value + (weldGlobalGreyVal * 2), app.activeDocument.height.value + (weldGlobalGreyVal * 2), AnchorPosition.MIDDLECENTER);
+        app.backgroundColor.cmyk =  whiteColorObj;
+        frame();
+      }
+}
+//zgrzew
+
+var weldGlobalWhiteVal, weldGlobalGreyVal;
+weldGlobalWhiteVal = 0;
+weldGlobalGreyVal = 0;
+
 function startApp() {
-  win.close();
 
 	eyeDistanceEachOther = win.sliderPanel.te.text  ;
   eyeSizeT =  win.sliderPanel.sizeTedit.text ;
@@ -132,25 +158,29 @@ function startApp() {
   down = win.bottomGroup.down.value;
   left = win.bottomGroup.left.value;
   right = win.bottomGroup.right.value;
+
+  weldGlobalWhiteVal = parseFloat(weldGlobalWhite.text);
+  weldGlobalGreyVal = parseFloat(weldGlobalGrey.text);
+
   if (win.bottomGroup.alldocuments.value==true) {
       loop();
   } else {
     CreateEyelets(eyeDistanceEachOther, up, down, left, right, eyeDistanceFromEdgeT, eyeSizeT);
   }
+
+  win.close();
 };
 
+
 function loop() {
+  loop = true;
   for (var i = 0; i < app.documents.length; i++) {
     app.activeDocument = app.documents[i];
     CreateEyelets(eyeDistanceEachOther, up, down, left, right, eyeDistanceFromEdgeT, eyeSizeT);
   }
 }
 
-//zgrzew
-win.sliderPanel.add ("statictext", undefined, 'zgrzew bialy | white weld');
-var weldGlobalWhite = win.sliderPanel.add ("edittext", undefined, '0');
-win.sliderPanel.add ("statictext", undefined, 'zgrzew szary | grey weld');
-var weldGlobalGrey = win.sliderPanel.add ("edittext", undefined, '0');
+
 
 //color button
 var colorButton;
@@ -305,7 +335,7 @@ if (batchDistance!=0) {
 var eyeMultiplicator, eyeSize, _w_Amount, _h_Amount, eyeDistanceFromEdge, diffW, roundedDistanceW, diffH, roundedDistanceH, N_eyeDistanceFromEdge;
 
 function CreateEyelets (eyeDistanceEachOther, up, down, left, right, eyeDistanceFromEdgeT, eyeSizeT){
-  if (batchDistance!==0) {
+  if (batchDistance!==0 && batchDistance != null) {
 	//converting dpi in inches to centimeters ratio  - 1 inch = 2.54 centimeters
 	eyeMultiplicator =  app.activeDocument.resolution/2.54 ;
 	eyeSize = 0.7  * eyeMultiplicator;
@@ -322,28 +352,13 @@ function CreateEyelets (eyeDistanceEachOther, up, down, left, right, eyeDistance
   makeEyelets (up, down, left, right);
   } else {
 
+    weld();
+
     //parsing passed values
     eyeSizeT = parseFloat(eyeSizeT);
     eyeDistanceFromEdgeT = parseFloat(eyeDistanceFromEdgeT);
-    weldGlobalWhite = parseFloat(weldGlobalWhite.text);
-    weldGlobalGrey = parseFloat(weldGlobalGrey.text);
 
-    // alert( weldGlobalWhite + weldGlobalGrey )
-
-    //zgrzew | weld
-    if (weldGlobalWhite > 1) {
-      frame();
-      app.backgroundColor.cmyk =  whiteColorObj;
-      app.activeDocument.resizeCanvas(app.activeDocument.width.value + (weldGlobalWhite * 2), app.activeDocument.height.value + (weldGlobalWhite * 2), AnchorPosition.MIDDLECENTER);
-      frame();
-    } else if (weldGlobalGrey > 1){
-      app.backgroundColor.cmyk =  greyWeldColorObj;
-      app.activeDocument.resizeCanvas(app.activeDocument.width.value + (weldGlobalGrey * 2), app.activeDocument.height.value + (weldGlobalGrey * 2), AnchorPosition.MIDDLECENTER);
-      app.backgroundColor.cmyk =  whiteColorObj;
-      frame();
-    }
-
-    //converting dpi in inches to centimeters ratio  - 1 inch = 2.54 centimeters
+    // converting dpi in inches to centimeters ratio  - 1 inch = 2.54 centimeters
   	eyeMultiplicator =  app.activeDocument.resolution/2.54 ;
   	eyeSize = eyeSizeT * eyeMultiplicator;
 
