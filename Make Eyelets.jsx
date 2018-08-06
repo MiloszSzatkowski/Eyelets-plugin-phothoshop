@@ -180,8 +180,6 @@ function loop() {
   }
 }
 
-
-
 //color button
 var colorButton;
 
@@ -210,9 +208,60 @@ var greyWeld = presetsGroup.add ("checkbox", undefined, 'Endoprint - zgrzew szar
 var napisTop = presetsGroup.add ("checkbox", undefined, 'Dodaj napis "top" | Add "top signature"');
 
 var standardPresets = presetsGroup.add('group {orientation: "row", alignChildren: ["fill","fill"]} ');
-var button25 = standardPresets.add ("button",undefined, 'standard - 25');
-var button30 = standardPresets.add ("button",undefined, 'standard - 30');
-var button50 = standardPresets.add ("button",undefined, 'standard - 50');
+
+win.bottomGroup.add ("statictext",undefined,'Szablony | Presets:');
+var button25 = win.bottomGroup.add ("button",undefined, 'standard - 25');
+var button30 = win.bottomGroup.add ("button",undefined, 'standard - 30');
+var button50 = win.bottomGroup.add ("button",undefined, 'standard - 50');
+var corners_ = win.bottomGroup.add ("button",undefined, 'Only in the corners / Tylko w naroznikach');
+var corners_weld = win.bottomGroup.add ("button",undefined, 'Only in the corners + weld / Tylko w naroznikach + zgrzew');
+
+button25.onClick = function () {
+ win.sliderPanel.te.text  = 25;
+ win.sliderPanel.sizeTedit.text = 0.7;
+ win.sliderPanel.distanceTedit.text = 1.5;
+ // standard weld - 3cm
+ weldGlobalWhite.text = 3;
+ startApp();
+}
+
+button30.onClick = function () {
+ win.sliderPanel.te.text  = 30;
+ win.sliderPanel.sizeTedit.text = 0.7;
+ win.sliderPanel.distanceTedit.text = 1.5;
+ // standard weld - 3cm
+ weldGlobalWhite.text = 3;
+ startApp();
+}
+
+button50.onClick = function () {
+ win.sliderPanel.te.text  = 50;
+ win.sliderPanel.sizeTedit.text = 0.7;
+ win.sliderPanel.distanceTedit.text = 1.5;
+ // standard weld - 3cm
+ weldGlobalWhite.text = 3;
+ startApp();
+}
+
+corners_.onClick = function () {
+  win.sliderPanel.te.text  = app.activeDocument.width.value;
+  win.sliderPanel.sizeTedit.text = 0.7;
+  win.sliderPanel.distanceTedit.text = 1.5;
+  win.bottomGroup.left.value = false;
+  win.bottomGroup.right.value = false;
+  startApp();
+}
+
+corners_weld.onClick = function () {
+  win.sliderPanel.te.text  = app.activeDocument.width.value;
+  win.sliderPanel.sizeTedit.text = 0.7;
+  win.sliderPanel.distanceTedit.text = 1.5;
+  win.bottomGroup.left.value = false;
+  win.bottomGroup.right.value = false;
+  // standard weld - 3cm
+  weldGlobalWhite.text = 3;
+  startApp();
+}
 
 function loopEndoprint() {
   for (var i = 0; i < app.documents.length; i++) {
@@ -303,26 +352,6 @@ function frame () {
   app.backgroundColor.cmyk =  whiteColorObj;
 }
 
-button25.onClick = function () {
- win.sliderPanel.te.text  = 25;
- win.sliderPanel.sizeTedit.text = 0.7;
- win.sliderPanel.distanceTedit.text = 1.5;
- startApp();
-}
-
-button30.onClick = function () {
- win.sliderPanel.te.text  = 30;
- win.sliderPanel.sizeTedit.text = 0.7;
- win.sliderPanel.distanceTedit.text = 1.5;
- startApp();
-}
-
-button50.onClick = function () {
- win.sliderPanel.te.text  = 50;
- win.sliderPanel.sizeTedit.text = 0.7;
- win.sliderPanel.distanceTedit.text = 1.5;
- startApp();
-}
 //szablony
 
 if (batchDistance!=0) {
