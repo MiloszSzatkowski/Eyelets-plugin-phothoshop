@@ -132,12 +132,16 @@ var onSidesOnly = win.sliderPanel.add ("checkbox", undefined, 'Zgrzew tylko na b
 var signTopDesc = win.sliderPanel.add('statictext', undefined, 'Dodaj napis na gorze | Add text on the top');
 var signTop = win.sliderPanel.add ("edittext", undefined, 0);
 
+
 var signBottomDesc = win.sliderPanel.add('statictext', undefined, 'Dodaj napis na dole | Add text on the bottom');
 var signBottom = win.sliderPanel.add ("edittext", undefined, 0);
 
-var top_sides_Desc = win.sliderPanel.add('checkbox', undefined, 'Dodaj napis \'top\' po bokach | Add \'top\' sign on sides');
-
 var addNameOfGraphic = win.sliderPanel.add ("checkbox", undefined, 'Dodaj nazwe pliku na brzegach | Add graphic\'s name on sides ');
+var size_NameOfGraphic_Desc = win.sliderPanel.add ('statictext' , undefined, 'Wielkosc tekstu | Size of text');
+var size_NameOfGraphic = win.sliderPanel.add ('edittext', undefined, 1);
+
+var top_sides_Desc = win.sliderPanel.add('checkbox', undefined, 'Dodaj napis \'top\' po bokach | Add \'top\' sign on sides');
+var endoprint = win.sliderPanel.add ("checkbox",undefined,'Zastosuj oczka 50->125->125... | Aplly eyelet chain 50->125->125...');
 
 var flatten_ = win.sliderPanel.add ("checkbox", undefined, 'Slaszcz obraz | Flatten image '); flatten_.value = true;
 
@@ -184,7 +188,7 @@ weldGlobalGreyVal = 0;
 function graphicName ()  {
   if (addNameOfGraphic.value === true || signBottom.text != 0 || signTop.text != 0){
     //
-    var size = 1;
+    var size = parseFloat(size_NameOfGraphic.text);
     var xPos = 10;
     var margin_ = 0.4;
 
@@ -334,20 +338,25 @@ var button30 = win.bottomGroup.add ("button",undefined, 'standard - 30');
 var button50 = win.bottomGroup.add ("button",undefined, 'standard - 50');
 var corners_ = win.bottomGroup.add ("button",undefined, 'Only in the corners / Tylko w naroznikach');
 var corners_weld = win.bottomGroup.add ("button",undefined, 'Only in the corners + weld / Tylko w naroznikach + zgrzew');
-var endoprint = win.bottomGroup.add ("button",undefined,'Zastosuj szablon oczek "Endoprint - Megabanner Bilka"');
 
 //bottom group amount - win.bottomGroup.add
 var info_desc = win.bottomGroup.add('statictext', undefined, 'Ilosci oczek - lista | Amount of eyelets - list')
-var info_ = win.bottomGroup.add ("treeview", undefined, []);
+var gen_info = win.bottomGroup.add ('button', undefined, 'Generuj ilosci oczek | Generate amount of eyelets')
+var info_ = win.bottomGroup.add ("treeview",  undefined, 'Ilosci oczek - lista | Amount of eyelets - list:')
+info_.add('item', '_________');
+info_.add('item', '_________');
+info_.add('item', '_________');
+info_.add('item', '_________');
+info_.add('item', '_________');
+info_.add('item', '_________');
 
 //  INFORMATION DROPDOWN
 function inform()  {
 
-  // debug -
   try {
     info_.removeAll();
-  } catch (err) {
-    alert(err);
+  } catch (variable) {
+    alert (variable);
   }
 
   var originActiveDoc = app.activeDocument;
@@ -361,16 +370,20 @@ function inform()  {
     app.activeDocument = app.documents[i];
     var ww = app.activeDocument.width.value / VAL;
     var hh = app.activeDocument.height.value / VAL;
-    if (ww < 2) { ww = 2; }
-    if (hh < 2) { hh = 2; }
-    info_.add ( 'item', (app.activeDocument.name + ' Pion|Vert:' + Math.round(ww) + ' Poz.|Hor.:' + Math.round(hh)) );
+    ww = (Math.round(ww) + 1);
+    hh = (Math.round(hh) + 1);
+    info_.add( 'item' ,  app.activeDocument.name);
+    info_.add( 'item' ,  'Horyzontalnie: ' + ww);
+    info_.add( 'item' ,  'Wertykalnie:   ' + hh);
+    info_.add('item', "--------------------------")
+
   }
 
   app.activeDocument = originActiveDoc;
 }
 
-win.sliderPanel.te.onChange = function () {  inform(); }
-try {  inform(); } catch (err) {  alert(err + '\n Czy otwarles dokument | Have you opened your file?')  }
+gen_info.onClick = function () {  try {  inform(); } catch (err) {  alert(err + '\n Czy otwarles dokument | Have you opened your file?')  } }
+
 
 button25.onClick = function () {
  win.sliderPanel.te.text  = 25;
@@ -413,22 +426,6 @@ corners_weld.onClick = function () {
   // standard weld - 3cm
   weldGlobalWhite.text = 3;
   startApp();
-}
-
-function loopEndoprint() {
-  for (var i = 0; i < app.documents.length; i++) {
-    app.activeDocument = app.documents[i];
-    endoEyelets();
-  }
-}
-
-endoprint.onClick = function () {
-  win.close();
-  if (win.bottomGroup.alldocuments.value==true) {
-      loopEndoprint();
-  } else {
-      endoEyelets();
-  }
 }
 
 function endoEyelets() {
@@ -476,9 +473,6 @@ function endoEyelets() {
   eyes[12] = new Ellipse(0-eyeSize/2, 0-eyeSize/2, eyeSize, eyeSize);
   eyes[12].translate( (app.activeDocument.width.value-1.5), (app.activeDocument.height.value - 1.5) );
 
-  if (napisTop.value) {
-    topEndoprint();
-  }
 }
 
 function frame () {
@@ -543,7 +537,9 @@ function CreateEyelets (eyeDistanceEachOther, up, down, left, right, eyeDistance
   	diffH = app.activeDocument.height - eyeDistanceFromEdge - eyeDistanceFromEdge;
   	roundedDistanceH= diffH / _h_Amount;
 
-    if (!skipEyelets.value) {
+    if (endoprint.value === true) {
+      endoEyelets ();
+    } else if (!skipEyelets.value) {
       makeEyelets (up, down, left, right);
     }
 
@@ -554,6 +550,24 @@ function CreateEyelets (eyeDistanceEachOther, up, down, left, right, eyeDistance
   }
 }
 
+//temp try
+// function TempEllipse(posXX, posYY, sizeXX, sizeYY)  {
+//  this.posXX = posXX;
+//  this.posYY = posYY;
+//  this.sizeXX = sizeXX;
+//  this.sizeYY = sizeYY;
+//
+//  TempEllipse.translate = function (deltaX, deltaY) {
+//     this.posXX = this.posXX + deltaX;
+//     this.posYY = this.posYY + deltaY;
+//     }
+// }
+//
+// function temp_translate(obj, deltaX, deltaY ) {
+//   obj.posXX = obj.posXX + deltaX;
+//   obj.posYY = obj.posYY + deltaY;
+// }
+
 function makeEyelets (up, down, left, right) {
 
   var CirclesTop = [];
@@ -561,21 +575,28 @@ function makeEyelets (up, down, left, right) {
   var CirclesLeft= [];
   var CirclesRight = [];
 
+
+
   if (up==true) {
     //create top circles
     for (var i = 0; i < _w_Amount+1; i++){
       CirclesTop.push(new Ellipse(0-eyeSize/2, 0-eyeSize/2, eyeSize, eyeSize));
     }
 
+    // temp_translate(CirclesTop[0], eyeDistanceFromEdge, eyeDistanceFromEdge  );
     CirclesTop[0].translate(eyeDistanceFromEdge, eyeDistanceFromEdge);
 
     for (i = 1; i < CirclesTop.length; i++) {
       if (i==1) {
+        // temp_translate(CirclesTop[i], eyeDistanceFromEdge, eyeDistanceFromEdge  );
         CirclesTop[i].translate(eyeDistanceFromEdge, eyeDistanceFromEdge);
+        // temp_translate(CirclesTop[i], roundedDistanceW, 0  );
         CirclesTop[i].translate(roundedDistanceW, 0);
 
       } else {
+        // temp_translate(CirclesTop[i], eyeDistanceFromEdge, eyeDistanceFromEdge  );
         CirclesTop[i].translate(eyeDistanceFromEdge, eyeDistanceFromEdge);
+        // temp_translate(CirclesTop[i], roundedDistanceW*i, 0  );
         CirclesTop[i].translate(roundedDistanceW*i, 0);
       }
     }
@@ -588,15 +609,20 @@ function makeEyelets (up, down, left, right) {
       CirclesBottom.push(new Ellipse(0-eyeSize/2, 0-eyeSize/2, eyeSize, eyeSize));
     }
 
+    // temp_translate(CirclesBottom[0], eyeDistanceFromEdge, app.activeDocument.height-eyeDistanceFromEdge  );
     CirclesBottom[0].translate(eyeDistanceFromEdge, app.activeDocument.height-eyeDistanceFromEdge);
 
     for (i = 1; i < CirclesBottom.length; i++) {
       if (i==1) {
+        // temp_translate(CirclesBottom[0], eyeDistanceFromEdge, app.activeDocument.height-eyeDistanceFromEdge  );
         CirclesBottom[i].translate(eyeDistanceFromEdge, app.activeDocument.height-eyeDistanceFromEdge);
+        // temp_translate(CirclesBottom[0], roundedDistanceW, 0  );
         CirclesBottom[i].translate(roundedDistanceW, 0);
 
       } else {
+        // temp_translate(CirclesBottom[0], eyeDistanceFromEdge, app.activeDocument.height-eyeDistanceFromEdge  );
         CirclesBottom[i].translate(eyeDistanceFromEdge, app.activeDocument.height-eyeDistanceFromEdge);
+        // temp_translate(CirclesBottom[0], roundedDistanceW*i, 0  );
         CirclesBottom[i].translate(roundedDistanceW*i, 0);
       }
     }
@@ -609,15 +635,20 @@ function makeEyelets (up, down, left, right) {
       CirclesLeft.push(new Ellipse(0-eyeSize/2, 0-eyeSize/2, eyeSize, eyeSize));
     }
 
+    // temp_translate(CirclesLeft[0], eyeDistanceFromEdge, eyeDistanceFromEdge  );
     CirclesLeft[0].translate(eyeDistanceFromEdge, eyeDistanceFromEdge);
 
     for (i = 1; i < CirclesLeft.length; i++) {
       if (i==1) {
+        // temp_translate(CirclesLeft[0], eyeDistanceFromEdge, eyeDistanceFromEdge );
         CirclesLeft[i].translate(eyeDistanceFromEdge, eyeDistanceFromEdge);
+        // temp_translate(CirclesLeft[0], 0,roundedDistanceH );
         CirclesLeft[i].translate(0,roundedDistanceH);
 
       } else {
+        // temp_translate(CirclesLeft[0], eyeDistanceFromEdge, eyeDistanceFromEdge );
         CirclesLeft[i].translate(eyeDistanceFromEdge, eyeDistanceFromEdge);
+        // temp_translate(CirclesLeft[0], 0,roundedDistanceH*i );
         CirclesLeft[i].translate(0,roundedDistanceH*i);
       }
     }
@@ -630,19 +661,52 @@ function makeEyelets (up, down, left, right) {
       CirclesRight.push(new Ellipse(0-eyeSize/2, 0-eyeSize/2, eyeSize, eyeSize));
     }
 
+    // temp_translate(CirclesRight[0], app.activeDocument.width-eyeDistanceFromEdge, eyeDistanceFromEdge );
     CirclesRight[0].translate(app.activeDocument.width-eyeDistanceFromEdge, eyeDistanceFromEdge);
 
     for (i = 1; i < CirclesRight.length; i++) {
       if (i==1) {
+        // temp_translate(CirclesRight[0], app.activeDocument.width-eyeDistanceFromEdge, eyeDistanceFromEdge );
         CirclesRight[i].translate(app.activeDocument.width-eyeDistanceFromEdge, eyeDistanceFromEdge);
+        // temp_translate(CirclesRight[0], 0,roundedDistanceH );
         CirclesRight[i].translate(0,roundedDistanceH);
 
       } else {
+        // temp_translate(CirclesRight[0], app.activeDocument.width-eyeDistanceFromEdge, eyeDistanceFromEdge );
         CirclesRight[i].translate(app.activeDocument.width-eyeDistanceFromEdge, eyeDistanceFromEdge);
+        // temp_translate(CirclesRight[0], 0,roundedDistanceH*i );
         CirclesRight[i].translate(0,roundedDistanceH*i);
       }
     }
   }
+
+  //unpacking to real eyelets
+  // var RealE = [];
+  //
+  // if (CirclesTop    .length > 0){
+  //   for (i = 0;  i < CirclesTop.length; i++) {
+  //     RealE.push ( new Ellipse (CirclesTop[i].posXX, CirclesTop[i].posYY,
+  //                               CirclesTop[i].sizeXX, CirclesTop[i].sizeYY)  );
+  //   }
+  // }
+  // if (CirclesBottom .length > 0) {
+  //   for (i = 0;  i < CirclesBottom.length; i++) {
+  //     RealE.push ( new Ellipse (CirclesBottom[i].posXX, CirclesBottom[i].posYY,
+  //                               CirclesBottom[i].sizeXX, CirclesBottom[i].sizeYY)  );
+  //   }
+  // }
+  // if (CirclesLeft   .length > 0) {
+  //   for (i = 0;  i < CirclesLeft.length; i++) {
+  //     RealE.push ( new Ellipse (CirclesLeft[i].posXX, CirclesLeft[i].posYY,
+  //                               CirclesLeft[i].sizeXX, CirclesLeft[i].sizeYY)  );
+  //   }
+  // }
+  // if (CirclesRight   .length > 0) {
+  //   for (i = 0;  i < CirclesRight.length; i++) {
+  //     RealE.push ( new Ellipse (CirclesRight[i].posXX, CirclesRight[i].posYY,
+  //                               CirclesRight[i].sizeXX, CirclesRight[i].sizeYY)  );
+  //   }
+  // }
 
 }
 
