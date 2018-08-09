@@ -1,3 +1,6 @@
-# Eyelets-plugin-phothoshop
+# Professional DTP plugin for Photoshop
 
-The script is using Layers.js library - https://github.com/darkwark/Photoshop to draw circles. Script places eyelets in proportional manner, given the distance. 
+![alt text](https://raw.githubusercontent.com/username/projectname/branch/path/to/img.png)
+
+Credits:
+The script is using Layers.js library - https://github.com/darkwark/Photoshop to speed up drawing of circles.
