@@ -3,9 +3,9 @@
 The script helps to draw eyelets on the graphic using many custom options.
 Some of the options include:
 
--adding name of the file on graphic
--adding weld
--generating information about eyelets' placement
+#adding name of the file on graphic
+#adding weld
+#generating information about eyelets' placement
 
 The script will be mainly used to prepare banners and other big prints that need to mounted using eyelets.
 Drawing eyelets on the graphic helps to speed up production workflow.
