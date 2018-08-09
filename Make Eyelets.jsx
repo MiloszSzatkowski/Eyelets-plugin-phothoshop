@@ -83,11 +83,11 @@ windowResource = "dialog {  \
         orientation: 'column', \
         alignChildren: 'fill', \
         st: StaticText { text: 'Odstep | Distance:' }, \
-        te: EditText { text: '30', characters: 5, justify: 'left'} \
+        te: EditText { text: '30', characters: 5, justify: 'left'}, \
         sizeT: StaticText { text: 'Wielkosc | Size:' }, \
         sizeTedit: EditText { text: '0.7', characters: 5, justify: 'left'} \
         distanceT: StaticText { text: 'Margines | Margin:' }, \
-        distanceTedit: EditText { text: '1.5', characters: 5, justify: 'left'} \
+        distanceTedit: EditText { text: '1.5', characters: 5, justify: 'left'}, \
         } \
     \
     bottomGroup: Group{ \
@@ -127,26 +127,153 @@ var weldGlobalWhite = win.sliderPanel.add ("edittext", undefined, 0);
 win.sliderPanel.add ("statictext", undefined, 'zgrzew szary | grey weld');
 var weldGlobalGrey = win.sliderPanel.add ("edittext", undefined, 0);
 
+var onSidesOnly = win.sliderPanel.add ("checkbox", undefined, 'Zgrzew tylko na bokach | Weld on sides only');
+
+var signTopDesc = win.sliderPanel.add('statictext', undefined, 'Dodaj napis na gorze | Add text on the top');
+var signTop = win.sliderPanel.add ("edittext", undefined, 0);
+
+var signBottomDesc = win.sliderPanel.add('statictext', undefined, 'Dodaj napis na dole | Add text on the bottom');
+var signBottom = win.sliderPanel.add ("edittext", undefined, 0);
+
+var top_sides_Desc = win.sliderPanel.add('checkbox', undefined, 'Dodaj napis \'top\' po bokach | Add \'top\' sign on sides');
+
+var addNameOfGraphic = win.sliderPanel.add ("checkbox", undefined, 'Dodaj nazwe pliku na brzegach | Add graphic\'s name on sides ');
+
+var flatten_ = win.sliderPanel.add ("checkbox", undefined, 'Slaszcz obraz | Flatten image '); flatten_.value = true;
+
+var skipEyelets = win.sliderPanel.add ("checkbox", undefined, 'Pomin oczka | Skip eyelets ');
+
+////////////////////////////////////////// WELD *****************************
+
 function weld() {
       // alert( weldGlobalWhiteVal + weldGlobalGreyVal );
       //zgrzew | weld
-      if (weldGlobalWhiteVal !== 0 && weldGlobalWhiteVal > 0.1) {
+      //weld on sides
+      if (onSidesOnly.value===true && weldGlobalWhiteVal !== 0 && weldGlobalWhiteVal > 0.1) {
+        frame();
+        app.backgroundColor.cmyk =  whiteColorObj;
+        app.activeDocument.resizeCanvas(app.activeDocument.width.value + (weldGlobalWhiteVal * 2),   app.activeDocument.height.value, AnchorPosition.MIDDLECENTER);
+        frame();
+      } else if (onSidesOnly.value===true && weldGlobalGreyVal !== 0 && weldGlobalGreyVal > 0.1) {
+        app.backgroundColor.cmyk =  greyWeldColorObj;
+        app.activeDocument.resizeCanvas(app.activeDocument.width.value + (weldGlobalGreyVal * 2),   app.activeDocument.height.value, AnchorPosition.MIDDLECENTER);
+        app.backgroundColor.cmyk =  whiteColorObj;
+        frame();
+        //weld around graphic
+      } else if (weldGlobalWhiteVal !== 0 && weldGlobalWhiteVal > 0.1) {
         frame();
         app.backgroundColor.cmyk =  whiteColorObj;
         app.activeDocument.resizeCanvas(app.activeDocument.width.value + (weldGlobalWhiteVal * 2), app.activeDocument.height.value + (weldGlobalWhiteVal * 2), AnchorPosition.MIDDLECENTER);
         frame();
       } else if (weldGlobalGreyVal !== 0 && weldGlobalGreyVal > 0.1){
         app.backgroundColor.cmyk =  greyWeldColorObj;
-        app.activeDocument.resizeCanvas(app.activeDocument.width.value + (weldGlobalGreyVal * 2), app.activeDocument.height.value + (weldGlobalGreyVal * 2), AnchorPosition.MIDDLECENTER);
+        app.activeDocument.resizeCanvas(app.activeDocument.width.value + (weldGlobalGreyVal * 2),  app.activeDocument.height.value + (weldGlobalGreyVal * 2), AnchorPosition.MIDDLECENTER);
         app.backgroundColor.cmyk =  whiteColorObj;
         frame();
       }
+
 }
 //zgrzew
 
 var weldGlobalWhiteVal, weldGlobalGreyVal;
 weldGlobalWhiteVal = 0;
 weldGlobalGreyVal = 0;
+
+////////////////////////////////////////// WELD *****************************
+
+function graphicName ()  {
+  if (addNameOfGraphic.value === true || signBottom.text != 0 || signTop.text != 0){
+    //
+    var size = 1;
+    var xPos = 10;
+    var margin_ = 0.4;
+
+    //how bounds work
+    // var LB = activeDocument.activeLayer.bounds;
+    //   var LWidth = (LB[2].value) - (LB[0].value);
+    //   var LHeight = (LB[3].value) - (LB[1].value);
+
+    //top *******************************
+    var topLayer = app.activeDocument.artLayers.add();
+    topLayer.kind = LayerKind.TEXT;
+    topLayer.textItem.color.cmyk = redColorObj;
+
+      if (signTop.text == 0 && (addNameOfGraphic.value === false) ) {
+        topLayer.textItem.contents = '_';
+        topLayer.textItem.color.cmyk = whiteColorObj;
+      } else if (signTop.text != 0) {
+        topLayer.textItem.contents = signTop.text;
+      } else if (addNameOfGraphic.value === true)  {
+        topLayer.textItem.contents = app.activeDocument.name;
+      }
+
+    topLayer.textItem.size= (size + ' cm');
+
+    MoveLayerToAbsolute (topLayer  , xPos,
+    0 + margin_);
+
+    if (app.activeDocument.width.value > 100) {
+      var topCopy = topLayer.duplicate();
+      MoveLayerToAbsolute (topCopy  , (app.activeDocument.width.value - xPos - (topCopy.bounds[2].value - topCopy.bounds[0].value)) ,
+      0 + margin_);
+    }
+
+    //*******************************
+
+    //bottom *******************************
+    var bottomLayer = app.activeDocument.artLayers.add();
+    bottomLayer.kind = LayerKind.TEXT;
+    bottomLayer.textItem.color.cmyk = redColorObj;
+
+      if (signBottom.text == 0 && (addNameOfGraphic.value === false) )  {
+        bottomLayer.textItem.contents = '_';
+        bottomLayer.textItem.color.cmyk = whiteColorObj;
+      } else if (signBottom.text != 0) {
+        bottomLayer.textItem.contents = signBottom.text;
+      } else if (addNameOfGraphic.value === true) {
+        bottomLayer.textItem.contents = app.activeDocument.name;
+      }
+
+    bottomLayer.textItem.size= (size + ' cm');
+
+    MoveLayerToAbsolute (bottomLayer, xPos,
+    (app.activeDocument.height.value - size - margin_)) ;
+
+    if (app.activeDocument.width.value > 100) {
+      var botCopy = bottomLayer.duplicate();
+      MoveLayerToAbsolute (botCopy, (app.activeDocument.width.value - xPos - (botCopy.bounds[2].value - botCopy.bounds[0].value)) ,
+      (app.activeDocument.height.value - size - margin_));
+    }
+    //*******************************
+
+  }
+
+  //add top on sides
+  if (top_sides_Desc.value) {
+
+    var size = 1;
+    var topOffset = 13;
+
+    var toppL = app.activeDocument.artLayers.add();
+    toppL.kind = LayerKind.TEXT;
+    toppL.textItem.color.cmyk = blackColorObj;
+    toppL.textItem.contents = 'TOP';
+    toppL.textItem.size= (size + ' cm');
+
+    MoveLayerToAbsolute (toppL, size, topOffset) ;
+    var topCopy = toppL.duplicate();
+    MoveLayerToAbsolute (topCopy, (app.activeDocument.width.value - size - (topCopy.bounds[2].value - topCopy.bounds[0].value)), topOffset);
+  }
+
+}
+
+function MoveLayerToAbsolute (fLayer,fX,fY) {
+  var Position = fLayer.bounds;
+  Position[0] = fX - Position[0];
+  Position[1] = fY - Position[1];
+
+  fLayer.translate(-Position[0],-Position[1]);
+}
 
 function startApp() {
 
@@ -183,8 +310,8 @@ function loop() {
 //color button
 var colorButton;
 
-  win.rightGroup.add('statictext',undefined,'Kolor oczek | Eyelets color:');
-  var myDropdown = win.rightGroup.add ("dropdownlist", undefined, ['czarny | black','bialy | white','szary | grey','czerwony | red','zielony | green','cyan']);
+  win.bottomGroup.add('statictext',undefined,'Kolor oczek | Eyelets color:');
+  var myDropdown = win.bottomGroup.add ("dropdownlist", undefined, ['czarny | black','bialy | white','szary | grey','czerwony | red','zielony | green','cyan']);
   myDropdown.items[0].image = ScriptUI.newImage (File(new File((new File($.fileName)).parent +"/01 black.png")));
   myDropdown.items[1].image = ScriptUI.newImage (File(new File((new File($.fileName)).parent +"/02 white.png")));
   myDropdown.items[2].image = ScriptUI.newImage (File(new File((new File($.fileName)).parent +"/03 grey.png")));
@@ -200,14 +327,6 @@ myDropdown.selection = 0;
 //color button
 
 //szablony
-var presetsGroup = win.rightGroup.add('group {orientation: "column", alignChildren: ["fill","fill"]} ');
-presetsGroup.add ("statictext",undefined,'Szablony | Presets:');
-var endoprint = presetsGroup.add ("button",undefined,'Zastosuj szablon oczek "Endoprint - Megabanner Bilka"');
-var whiteWeld = presetsGroup.add ("checkbox", undefined, 'Endoprint - zgrzew bialy | white weld');
-var greyWeld = presetsGroup.add ("checkbox", undefined, 'Endoprint - zgrzew szary | grey weld');
-var napisTop = presetsGroup.add ("checkbox", undefined, 'Dodaj napis "top" | Add "top signature"');
-
-var standardPresets = presetsGroup.add('group {orientation: "row", alignChildren: ["fill","fill"]} ');
 
 win.bottomGroup.add ("statictext",undefined,'Szablony | Presets:');
 var button25 = win.bottomGroup.add ("button",undefined, 'standard - 25');
@@ -215,6 +334,43 @@ var button30 = win.bottomGroup.add ("button",undefined, 'standard - 30');
 var button50 = win.bottomGroup.add ("button",undefined, 'standard - 50');
 var corners_ = win.bottomGroup.add ("button",undefined, 'Only in the corners / Tylko w naroznikach');
 var corners_weld = win.bottomGroup.add ("button",undefined, 'Only in the corners + weld / Tylko w naroznikach + zgrzew');
+var endoprint = win.bottomGroup.add ("button",undefined,'Zastosuj szablon oczek "Endoprint - Megabanner Bilka"');
+
+//bottom group amount - win.bottomGroup.add
+var info_desc = win.bottomGroup.add('statictext', undefined, 'Ilosci oczek - lista | Amount of eyelets - list')
+var info_ = win.bottomGroup.add ("treeview", undefined, []);
+
+//  INFORMATION DROPDOWN
+function inform()  {
+
+  // debug -
+  try {
+    info_.removeAll();
+  } catch (err) {
+    alert(err);
+  }
+
+  var originActiveDoc = app.activeDocument;
+
+  var VAL = parseFloat(win.sliderPanel.te.text)
+
+  _accum = [];
+
+  for (var i = 0; i < app.documents.length; i++) {
+
+    app.activeDocument = app.documents[i];
+    var ww = app.activeDocument.width.value / VAL;
+    var hh = app.activeDocument.height.value / VAL;
+    if (ww < 2) { ww = 2; }
+    if (hh < 2) { hh = 2; }
+    info_.add ( 'item', (app.activeDocument.name + ' Pion|Vert:' + Math.round(ww) + ' Poz.|Hor.:' + Math.round(hh)) );
+  }
+
+  app.activeDocument = originActiveDoc;
+}
+
+win.sliderPanel.te.onChange = function () {  inform(); }
+try {  inform(); } catch (err) {  alert(err + '\n Czy otwarles dokument | Have you opened your file?')  }
 
 button25.onClick = function () {
  win.sliderPanel.te.text  = 25;
@@ -245,8 +401,6 @@ button50.onClick = function () {
 
 corners_.onClick = function () {
   win.sliderPanel.te.text  = app.activeDocument.width.value;
-  win.sliderPanel.sizeTedit.text = 0.7;
-  win.sliderPanel.distanceTedit.text = 1.5;
   win.bottomGroup.left.value = false;
   win.bottomGroup.right.value = false;
   startApp();
@@ -254,8 +408,6 @@ corners_.onClick = function () {
 
 corners_weld.onClick = function () {
   win.sliderPanel.te.text  = app.activeDocument.width.value;
-  win.sliderPanel.sizeTedit.text = 0.7;
-  win.sliderPanel.distanceTedit.text = 1.5;
   win.bottomGroup.left.value = false;
   win.bottomGroup.right.value = false;
   // standard weld - 3cm
@@ -280,18 +432,6 @@ endoprint.onClick = function () {
 }
 
 function endoEyelets() {
-  if (whiteWeld.value===true) {
-    frame();
-    app.backgroundColor.cmyk =  whiteColorObj;
-    app.activeDocument.resizeCanvas(app.activeDocument.width.value+6, app.activeDocument.height.value, AnchorPosition.MIDDLECENTER);
-    frame();
-  } else if (greyWeld.value===true) {
-    app.backgroundColor.cmyk =  greyWeldColorObj;
-    app.activeDocument.resizeCanvas(app.activeDocument.width.value+6, app.activeDocument.height.value, AnchorPosition.MIDDLECENTER);
-    app.backgroundColor.cmyk =  whiteColorObj;
-    frame();
-  }
-
   var eyes = [];
 
   //converting dpi in inches to centimeters ratio  - 1 inch = 2.54 centimeters
@@ -382,6 +522,7 @@ function CreateEyelets (eyeDistanceEachOther, up, down, left, right, eyeDistance
   } else {
 
     weld();
+    graphicName();
 
     //parsing passed values
     eyeSizeT = parseFloat(eyeSizeT);
@@ -402,7 +543,13 @@ function CreateEyelets (eyeDistanceEachOther, up, down, left, right, eyeDistance
   	diffH = app.activeDocument.height - eyeDistanceFromEdge - eyeDistanceFromEdge;
   	roundedDistanceH= diffH / _h_Amount;
 
-    makeEyelets (up, down, left, right);
+    if (!skipEyelets.value) {
+      makeEyelets (up, down, left, right);
+    }
+
+    if(flatten_.value){
+      app.activeDocument.flatten();
+    }
 
   }
 }
@@ -496,213 +643,6 @@ function makeEyelets (up, down, left, right) {
       }
     }
   }
-
-}
-
-function topEndoprint() {
-  firstDoc = app.activeDocument;
-  new_layer_from_file = open(new File((new File($.fileName)).parent +"/topEndoprint.png"));
-  new_layer_from_file.resizeImage(  null,  null,  firstDoc.resolution,  ResampleMethod.BICUBIC );
-  new_layer_from_file.selection.selectAll();
-  new_layer_from_file.selection.copy();
-  new_layer_from_file.close(SaveOptions.DONOTSAVECHANGES);
-  firstDoc.paste();
-
-  app.preferences.rulerUnits = Units.CM;
-  oCM = app.activeDocument.width.value;
-  app.preferences.rulerUnits = Units.PIXELS;
-  oPX = app.activeDocument.width.value;
-  factor = oPX/oCM;
-  app.preferences.rulerUnits = Units.CM;
-  oCM = app.activeDocument.width.value;
-  moveY = 25 * factor;
-  // =======================================================
-  // =======================================================
-var idsetd = charIDToTypeID( "setd" );
-    var desc819 = new ActionDescriptor();
-    var idnull = charIDToTypeID( "null" );
-        var ref569 = new ActionReference();
-        var idChnl = charIDToTypeID( "Chnl" );
-        var idfsel = charIDToTypeID( "fsel" );
-        ref569.putProperty( idChnl, idfsel );
-    desc819.putReference( idnull, ref569 );
-    var idT = charIDToTypeID( "T   " );
-    var idOrdn = charIDToTypeID( "Ordn" );
-    var idAl = charIDToTypeID( "Al  " );
-    desc819.putEnumerated( idT, idOrdn, idAl );
-executeAction( idsetd, desc819, DialogModes.NO );
-
-// =======================================================
-var idAlgn = charIDToTypeID( "Algn" );
-    var desc820 = new ActionDescriptor();
-    var idnull = charIDToTypeID( "null" );
-        var ref570 = new ActionReference();
-        var idLyr = charIDToTypeID( "Lyr " );
-        var idOrdn = charIDToTypeID( "Ordn" );
-        var idTrgt = charIDToTypeID( "Trgt" );
-        ref570.putEnumerated( idLyr, idOrdn, idTrgt );
-    desc820.putReference( idnull, ref570 );
-    var idUsng = charIDToTypeID( "Usng" );
-    var idADSt = charIDToTypeID( "ADSt" );
-    var idAdLf = charIDToTypeID( "AdLf" );
-    desc820.putEnumerated( idUsng, idADSt, idAdLf );
-executeAction( idAlgn, desc820, DialogModes.NO );
-
-// =======================================================
-var idAlgn = charIDToTypeID( "Algn" );
-    var desc821 = new ActionDescriptor();
-    var idnull = charIDToTypeID( "null" );
-        var ref571 = new ActionReference();
-        var idLyr = charIDToTypeID( "Lyr " );
-        var idOrdn = charIDToTypeID( "Ordn" );
-        var idTrgt = charIDToTypeID( "Trgt" );
-        ref571.putEnumerated( idLyr, idOrdn, idTrgt );
-    desc821.putReference( idnull, ref571 );
-    var idUsng = charIDToTypeID( "Usng" );
-    var idADSt = charIDToTypeID( "ADSt" );
-    var idAdTp = charIDToTypeID( "AdTp" );
-    desc821.putEnumerated( idUsng, idADSt, idAdTp );
-executeAction( idAlgn, desc821, DialogModes.NO );
-
-// =======================================================
-var idsetd = charIDToTypeID( "setd" );
-    var desc822 = new ActionDescriptor();
-    var idnull = charIDToTypeID( "null" );
-        var ref572 = new ActionReference();
-        var idChnl = charIDToTypeID( "Chnl" );
-        var idfsel = charIDToTypeID( "fsel" );
-        ref572.putProperty( idChnl, idfsel );
-    desc822.putReference( idnull, ref572 );
-    var idT = charIDToTypeID( "T   " );
-    var idOrdn = charIDToTypeID( "Ordn" );
-    var idNone = charIDToTypeID( "None" );
-    desc822.putEnumerated( idT, idOrdn, idNone );
-executeAction( idsetd, desc822, DialogModes.NO );
-
-// =======================================================
-var idTrnf = charIDToTypeID( "Trnf" );
-    var desc823 = new ActionDescriptor();
-    var idnull = charIDToTypeID( "null" );
-        var ref573 = new ActionReference();
-        var idLyr = charIDToTypeID( "Lyr " );
-        var idOrdn = charIDToTypeID( "Ordn" );
-        var idTrgt = charIDToTypeID( "Trgt" );
-        ref573.putEnumerated( idLyr, idOrdn, idTrgt );
-    desc823.putReference( idnull, ref573 );
-    var idFTcs = charIDToTypeID( "FTcs" );
-    var idQCSt = charIDToTypeID( "QCSt" );
-    var idQcsa = charIDToTypeID( "Qcsa" );
-    desc823.putEnumerated( idFTcs, idQCSt, idQcsa );
-    var idOfst = charIDToTypeID( "Ofst" );
-        var desc824 = new ActionDescriptor();
-        var idHrzn = charIDToTypeID( "Hrzn" );
-        var idRlt = charIDToTypeID( "#Rlt" );
-        desc824.putUnitDouble( idHrzn, idRlt, 0.000000 );
-        var idVrtc = charIDToTypeID( "Vrtc" );
-        var idRlt = charIDToTypeID( "#Rlt" );
-        desc824.putUnitDouble( idVrtc, idRlt, moveY );
-    var idOfst = charIDToTypeID( "Ofst" );
-    desc823.putObject( idOfst, idOfst, desc824 );
-    var idIntr = charIDToTypeID( "Intr" );
-    var idIntp = charIDToTypeID( "Intp" );
-    var idbicubicSmoother = stringIDToTypeID( "bicubicSmoother" );
-    desc823.putEnumerated( idIntr, idIntp, idbicubicSmoother );
-executeAction( idTrnf, desc823, DialogModes.NO );
-
-// =======================================================
-var idsetd = charIDToTypeID( "setd" );
-    var desc825 = new ActionDescriptor();
-    var idnull = charIDToTypeID( "null" );
-        var ref574 = new ActionReference();
-        var idChnl = charIDToTypeID( "Chnl" );
-        var idfsel = charIDToTypeID( "fsel" );
-        ref574.putProperty( idChnl, idfsel );
-    desc825.putReference( idnull, ref574 );
-    var idT = charIDToTypeID( "T   " );
-    var idOrdn = charIDToTypeID( "Ordn" );
-    var idAl = charIDToTypeID( "Al  " );
-    desc825.putEnumerated( idT, idOrdn, idAl );
-executeAction( idsetd, desc825, DialogModes.NO );
-
-// =======================================================
-var idCpTL = charIDToTypeID( "CpTL" );
-executeAction( idCpTL, undefined, DialogModes.NO );
-
-// =======================================================
-var idsetd = charIDToTypeID( "setd" );
-    var desc826 = new ActionDescriptor();
-    var idnull = charIDToTypeID( "null" );
-        var ref575 = new ActionReference();
-        var idChnl = charIDToTypeID( "Chnl" );
-        var idfsel = charIDToTypeID( "fsel" );
-        ref575.putProperty( idChnl, idfsel );
-    desc826.putReference( idnull, ref575 );
-    var idT = charIDToTypeID( "T   " );
-    var idOrdn = charIDToTypeID( "Ordn" );
-    var idAl = charIDToTypeID( "Al  " );
-    desc826.putEnumerated( idT, idOrdn, idAl );
-executeAction( idsetd, desc826, DialogModes.NO );
-
-// =======================================================
-var idAlgn = charIDToTypeID( "Algn" );
-    var desc827 = new ActionDescriptor();
-    var idnull = charIDToTypeID( "null" );
-        var ref576 = new ActionReference();
-        var idLyr = charIDToTypeID( "Lyr " );
-        var idOrdn = charIDToTypeID( "Ordn" );
-        var idTrgt = charIDToTypeID( "Trgt" );
-        ref576.putEnumerated( idLyr, idOrdn, idTrgt );
-    desc827.putReference( idnull, ref576 );
-    var idUsng = charIDToTypeID( "Usng" );
-    var idADSt = charIDToTypeID( "ADSt" );
-    var idAdRg = charIDToTypeID( "AdRg" );
-    desc827.putEnumerated( idUsng, idADSt, idAdRg );
-executeAction( idAlgn, desc827, DialogModes.NO );
-
-// =======================================================
-var idsetd = charIDToTypeID( "setd" );
-    var desc828 = new ActionDescriptor();
-    var idnull = charIDToTypeID( "null" );
-        var ref577 = new ActionReference();
-        var idChnl = charIDToTypeID( "Chnl" );
-        var idfsel = charIDToTypeID( "fsel" );
-        ref577.putProperty( idChnl, idfsel );
-    desc828.putReference( idnull, ref577 );
-    var idT = charIDToTypeID( "T   " );
-    var idOrdn = charIDToTypeID( "Ordn" );
-    var idNone = charIDToTypeID( "None" );
-    desc828.putEnumerated( idT, idOrdn, idNone );
-executeAction( idsetd, desc828, DialogModes.NO );
-
-// =======================================================
-var idslct = charIDToTypeID( "slct" );
-    var desc829 = new ActionDescriptor();
-    var idnull = charIDToTypeID( "null" );
-        var ref578 = new ActionReference();
-        var idzoomTool = stringIDToTypeID( "zoomTool" );
-        ref578.putClass( idzoomTool );
-    desc829.putReference( idnull, ref578 );
-    var iddontRecord = stringIDToTypeID( "dontRecord" );
-    desc829.putBoolean( iddontRecord, true );
-    var idforceNotify = stringIDToTypeID( "forceNotify" );
-    desc829.putBoolean( idforceNotify, true );
-executeAction( idslct, desc829, DialogModes.NO );
-
-// =======================================================
-var idslct = charIDToTypeID( "slct" );
-    var desc830 = new ActionDescriptor();
-    var idnull = charIDToTypeID( "null" );
-        var ref579 = new ActionReference();
-        var idmoveTool = stringIDToTypeID( "moveTool" );
-        ref579.putClass( idmoveTool );
-    desc830.putReference( idnull, ref579 );
-    var iddontRecord = stringIDToTypeID( "dontRecord" );
-    desc830.putBoolean( iddontRecord, true );
-    var idforceNotify = stringIDToTypeID( "forceNotify" );
-    desc830.putBoolean( idforceNotify, true );
-executeAction( idslct, desc830, DialogModes.NO );
-
-
 
 }
 
