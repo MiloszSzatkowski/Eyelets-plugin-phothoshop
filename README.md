@@ -15,7 +15,7 @@ Screenshot:
 ![readme.png](https://github.com/MiloszSzatkowski/Eyelets-plugin-phothoshop/blob/master/readme.png)
 
 Usage:
-Play the script from menu using File - > Automation - > Script in Photoshop.
+Play the script from menu using File - > Script - > Browse.. in Photoshop.
 If you're gonna be using script frequently, I recommend recording this as an action and binding appropiate key.
 
 Credits:
