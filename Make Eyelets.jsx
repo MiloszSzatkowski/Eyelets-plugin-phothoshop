@@ -158,8 +158,8 @@ var folder_box = win.fGroup.add('checkbox', undefined, 'Przetworz folder | Proce
 var extension, splitPath, inputFiles, outputFolder;
 var files_to_pr = [];
 
-win.fGroup.add('statictext', undefined, 'Lista plikow | File\'s list:');
-var mainGroup = win.fGroup.add( 'dropdownlist', undefined, 'Lista plikow | File\'s list:' );
+win.fGroup.add('statictext', undefined, 'Lista plikow | List of files:');
+var mainGroup = win.fGroup.add( 'dropdownlist', undefined, 'Lista plikow | List of files:' );
 
 mainGroup.add('item', '_________');
 
