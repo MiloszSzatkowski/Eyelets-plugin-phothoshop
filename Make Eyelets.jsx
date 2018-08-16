@@ -103,6 +103,10 @@ windowResource = "dialog {  \
       orientation: 'column',\
       alignChildren: 'fill', \
     }\
+    fGroup: Group{ \
+      orientation: 'column',\
+      alignChildren: 'fill', \
+    }\
     closeGroup: Group{ \
       orientation: 'column',\
       alignChildren: 'fill', \
@@ -146,6 +150,67 @@ var endoprint = win.sliderPanel.add ("checkbox",undefined,'Zastosuj oczka 50->12
 var flatten_ = win.sliderPanel.add ("checkbox", undefined, 'Slaszcz obraz | Flatten image '); flatten_.value = true;
 
 var skipEyelets = win.sliderPanel.add ("checkbox", undefined, 'Pomin oczka | Skip eyelets ');
+
+/////////////////////////////////// *** loop through folder
+
+var folder_box = win.fGroup.add('checkbox', undefined, 'Przetworz folder | Process a folder');
+//global scope
+var extension, splitPath, inputFiles, outputFolder;
+var files_to_pr = [];
+
+win.fGroup.add('statictext', undefined, 'Lista plikow | File\'s list:');
+var mainGroup = win.fGroup.add( 'dropdownlist', undefined, 'Lista plikow | File\'s list:' );
+
+mainGroup.add('item', '_________');
+
+var desc_place = win.fGroup.add('statictext', undefined, 'Folder zapisu | Folder to save files:')
+var place_of_saving = win.fGroup.add('edittext', undefined, '____________', {multiline: true, readonly: true});
+
+folder_box.onClick = function () {
+  if (folder_box.value) {
+    var inputFolder = Folder.selectDialog("Otworz folder do przetworzenia / Open folder for processing");
+    if (inputFolder == null) {
+      folder_box.value = false;
+    } else {
+        inputFiles = inputFolder.getFiles();
+        cleanList();
+
+      for (var i = 0; i < files_to_pr.length; i++){
+        var temp_arr = decodeURI(files_to_pr[i].toString()).split('/');
+        mainGroup.add('item', temp_arr[temp_arr.length-1]);
+      }
+
+      outputFolder = Folder.selectDialog("Otworz folder do zapisania / Open folder for saving");
+      if (outputFolder != null) {
+        place_of_saving.text = ( decodeURI(outputFolder.toString()) );
+      } else {
+        alert( 'Nie wybrano folderu | Nothing has been chosen.' );
+      }
+    }
+  } else {
+    mainGroup.removeAll();
+    place_of_saving.text = '';
+  }
+}
+
+
+function cleanList() {
+  for (var i = 0; i < inputFiles.length; i++){
+    splitPath = inputFiles[i].toString().split(".");
+    extension = splitPath[splitPath.length-1];
+    if (
+    extension=='TIF'      ||
+    extension=='tif'      ||
+    extension=='jpeg'     ||
+    extension=='jpg'      ||
+    extension=='JPEG'     ||
+    extension=='JPG'
+    ) {
+      files_to_pr.push( inputFiles[i] );
+
+    }
+  }
+}
 
 ////////////////////////////////////////// WELD *****************************
 
@@ -295,19 +360,38 @@ function startApp() {
 
   if (win.bottomGroup.alldocuments.value==true) {
       loop();
+  } else if (folder_box.value === true) {
+      loop_folder();
   } else {
-    CreateEyelets(eyeDistanceEachOther, up, down, left, right, eyeDistanceFromEdgeT, eyeSizeT);
+      CreateEyelets(eyeDistanceEachOther, up, down, left, right, eyeDistanceFromEdgeT, eyeSizeT);
   }
 
   win.close();
 };
-
 
 function loop() {
   loop = true;
   for (var i = 0; i < app.documents.length; i++) {
     app.activeDocument = app.documents[i];
     CreateEyelets(eyeDistanceEachOther, up, down, left, right, eyeDistanceFromEdgeT, eyeSizeT);
+  }
+}
+
+var openedFile, folderLoc, Name;
+function loop_folder () {
+  folderLoc = new Folder(outputFolder) + "/";
+
+  for (var i = 0; i < files_to_pr.length; i++) {
+    openedFile = app.open(inputFiles[i]);
+    app.activeDocument = openedFile;
+    CreateEyelets(eyeDistanceEachOther, up, down, left, right, eyeDistanceFromEdgeT, eyeSizeT);
+
+    Name = app.activeDocument.name.replace(/\.[^\.]+$/, '');
+
+    SaveTIFF( new File (folderLoc + '0' + i + '_' + Name + '_o' +
+    eyeDistanceEachOther + '_' + '.tif') );
+
+    openedFile.close(SaveOptions.DONOTSAVECHANGES);
   }
 }
 
@@ -708,6 +792,16 @@ function makeEyelets (up, down, left, right) {
   //   }
   // }
 
+}
+
+function SaveTIFF(saveFile){
+tiffSaveOptions = new TiffSaveOptions();
+tiffSaveOptions.embedColorProfile = true;
+tiffSaveOptions.alphaChannels = true;
+tiffSaveOptions.layers = true;
+tiffSaveOptions.imageCompression = TIFFEncoding.TIFFLZW;
+// tiffSaveOptions.jpegQuality=12;
+app.activeDocument.saveAs(saveFile, tiffSaveOptions, true, Extension.LOWERCASE);
 }
 
 // Release references
