@@ -388,8 +388,7 @@ function loop_folder () {
 
     Name = app.activeDocument.name.replace(/\.[^\.]+$/, '');
 
-    SaveTIFF( new File (folderLoc + '0' + i + '_' + Name + '_o' +
-    eyeDistanceEachOther + '_' + '.tif') );
+    SaveTIFF( new File (folderLoc + '0' + i + '_' + Name + '.tif') );
 
     openedFile.close(SaveOptions.DONOTSAVECHANGES);
   }
