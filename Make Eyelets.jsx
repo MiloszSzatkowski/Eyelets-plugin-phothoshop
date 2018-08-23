@@ -27,6 +27,11 @@ batchDistance = parseFloat(batchDistance);
 
 //specify colors
 //white
+var darkGreyWeldColorObj = new CMYKColor();
+  var gtempv = 30;
+  darkGreyWeldColorObj.cyan = gtempv;  darkGreyWeldColorObj.magenta  = gtempv;
+  darkGreyWeldColorObj.yellow = gtempv;  darkGreyWeldColorObj.black = gtempv;
+//lightgrey
 var greyWeldColorObj = new CMYKColor();
   var lol = 20;
   greyWeldColorObj.cyan = lol;  greyWeldColorObj.magenta  = lol;
@@ -72,10 +77,11 @@ var originalColor = app.foregroundColor.cmyk;
 // #target estoolkit
 var win, windowResource;
 
+var hiddenGroup = [];
+
 windowResource = "dialog {  \
     orientation: 'row', \
     alignChildren: ['fill', 'top'],  \
-    preferredSize:[300, 130], \
     text: 'Oczkowanie - skrypt | Eyelets - script',  \
     margins:15, \
     \
@@ -219,7 +225,7 @@ function weld() {
       //zgrzew | weld
       //weld on sides
       if (onSidesOnly.value===true && weldGlobalWhiteVal !== 0 && weldGlobalWhiteVal > 0.1) {
-        frame();
+        light_frame();
         app.backgroundColor.cmyk =  whiteColorObj;
         app.activeDocument.resizeCanvas(app.activeDocument.width.value + (weldGlobalWhiteVal * 2),   app.activeDocument.height.value, AnchorPosition.MIDDLECENTER);
         frame();
@@ -230,7 +236,7 @@ function weld() {
         frame();
         //weld around graphic
       } else if (weldGlobalWhiteVal !== 0 && weldGlobalWhiteVal > 0.1) {
-        frame();
+        light_frame();
         app.backgroundColor.cmyk =  whiteColorObj;
         app.activeDocument.resizeCanvas(app.activeDocument.width.value + (weldGlobalWhiteVal * 2), app.activeDocument.height.value + (weldGlobalWhiteVal * 2), AnchorPosition.MIDDLECENTER);
         frame();
@@ -569,7 +575,52 @@ function frame () {
   app.backgroundColor.cmyk =  whiteColorObj;
 }
 
+function light_frame () {
+  app.backgroundColor.cmyk =  darkGreyWeldColorObj;
+
+    app.activeDocument.resizeCanvas(
+      (app.activeDocument.width.value + 0.11),
+      (app.activeDocument.height.value + 0.11),
+      AnchorPosition.MIDDLECENTER);
+
+  app.backgroundColor.cmyk =  whiteColorObj;
+}
+
 //szablony
+
+//hide group
+// hiddenGroup = [info_desc,
+//                 onSidesOnly,
+//                 signTopDesc,
+//                 signTop,
+//                 signBottomDesc,
+//                 signBottom,
+//                 addNameOfGraphic,
+//                 size_NameOfGraphic_Desc,
+//                 size_NameOfGraphic,
+//                 top_sides_Desc,
+//                 endoprint,
+//                 skipEyelets,
+//                 folder_box,
+//                 mainGroup,
+//                 desc_place,
+//                 place_of_saving,
+//                 win.sliderPanel.sizeT,
+//                 win.sliderPanel.sizeTedit,
+//                 win.sliderPanel.sizeT,
+//                 win.sliderPanel.distanceTedit,
+//                 win.sliderPanel.distanceT,
+//                 gen_info
+//                         ];
+//
+//
+// try {
+//   for(var i = 0; i < hiddenGroup.length; i++){
+//     hiddenGroup[i].hide();
+//   }
+// } catch (variable) {
+//   alert ( variable );
+// }
 
 if (batchDistance!=0) {
   app.foregroundColor.cmyk = originalColor;
