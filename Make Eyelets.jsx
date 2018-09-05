@@ -224,6 +224,11 @@ function weld() {
       // alert( weldGlobalWhiteVal + weldGlobalGreyVal );
       //zgrzew | weld
       //weld on sides
+
+      if ((weldGlobalWhiteVal !== 0 && weldGlobalWhiteVal > 0.1) || (weldGlobalGreyVal !== 0 && weldGlobalGreyVal > 0.1)) {
+        app.activeDocument.flatten();
+      }
+
       if (onSidesOnly.value===true && weldGlobalWhiteVal !== 0 && weldGlobalWhiteVal > 0.1) {
         light_frame();
         app.backgroundColor.cmyk =  whiteColorObj;
