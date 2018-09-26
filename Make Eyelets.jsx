@@ -264,7 +264,12 @@ weldGlobalGreyVal = 0;
 function graphicName ()  {
   if (addNameOfGraphic.value === true || signBottom.text != 0 || signTop.text != 0){
     //
-    var size = parseFloat(size_NameOfGraphic.text);
+    var pre_size = parseFloat(size_NameOfGraphic.text);
+    var size_to_point_ratio = 28.3;
+    var size = pre_size * size_to_point_ratio;
+
+    // alert( size );
+    // alert (preferences.rulerUnits );
     var xPos = 10;
     var margin_ = 0.4;
 
@@ -287,10 +292,13 @@ function graphicName ()  {
         topLayer.textItem.contents = app.activeDocument.name;
       }
 
-    topLayer.textItem.size= (size + ' cm');
+    // topLayer.textItem.size= (size + ' cm');
 
-    MoveLayerToAbsolute (topLayer  , xPos,
-    0 + margin_);
+    topLayer.textItem.size = size;
+
+    topLayer.rasterize(RasterizeType.TEXTCONTENTS);
+
+    MoveLayerToAbsolute (topLayer  , xPos,  0 + margin_);
 
     if (app.activeDocument.width.value > 100) {
       var topCopy = topLayer.duplicate();
@@ -305,6 +313,7 @@ function graphicName ()  {
     bottomLayer.kind = LayerKind.TEXT;
     bottomLayer.textItem.color.cmyk = redColorObj;
 
+
       if (signBottom.text == 0 && (addNameOfGraphic.value === false) )  {
         bottomLayer.textItem.contents = '_';
         bottomLayer.textItem.color.cmyk = whiteColorObj;
@@ -314,15 +323,17 @@ function graphicName ()  {
         bottomLayer.textItem.contents = app.activeDocument.name;
       }
 
-    bottomLayer.textItem.size= (size + ' cm');
+    bottomLayer.textItem.size= size;
+
+    bottomLayer.rasterize(RasterizeType.TEXTCONTENTS);
 
     MoveLayerToAbsolute (bottomLayer, xPos,
-    (app.activeDocument.height.value - size - margin_)) ;
+    (app.activeDocument.height.value - pre_size - margin_)) ;
 
     if (app.activeDocument.width.value > 100) {
       var botCopy = bottomLayer.duplicate();
       MoveLayerToAbsolute (botCopy, (app.activeDocument.width.value - xPos - (botCopy.bounds[2].value - botCopy.bounds[0].value)) ,
-      (app.activeDocument.height.value - size - margin_));
+      (app.activeDocument.height.value - pre_size - margin_));
     }
     //*******************************
 
@@ -331,18 +342,23 @@ function graphicName ()  {
   //add top on sides
   if (top_sides_Desc.value) {
 
-    var size = 1;
+    var pre_size = 1;
+    var size_to_point_ratio = 28.3;
+    var size = pre_size * size_to_point_ratio;
+
     var topOffset = 13;
 
     var toppL = app.activeDocument.artLayers.add();
     toppL.kind = LayerKind.TEXT;
     toppL.textItem.color.cmyk = blackColorObj;
     toppL.textItem.contents = 'TOP';
-    toppL.textItem.size= (size + ' cm');
+    toppL.textItem.size= size;
 
-    MoveLayerToAbsolute (toppL, size, topOffset) ;
+    toppL.rasterize(RasterizeType.TEXTCONTENTS);
+
+    MoveLayerToAbsolute (toppL, pre_size, topOffset) ;
     var topCopy = toppL.duplicate();
-    MoveLayerToAbsolute (topCopy, (app.activeDocument.width.value - size - (topCopy.bounds[2].value - topCopy.bounds[0].value)), topOffset);
+    MoveLayerToAbsolute (topCopy, (app.activeDocument.width.value - pre_size - (topCopy.bounds[2].value - topCopy.bounds[0].value)), topOffset);
   }
 
 }
@@ -573,8 +589,8 @@ function frame () {
   app.backgroundColor.cmyk =  blackColorObj;
 
     app.activeDocument.resizeCanvas(
-      (app.activeDocument.width.value + 0.2),
-      (app.activeDocument.height.value + 0.2),
+      (app.activeDocument.width.value + 0.15),
+      (app.activeDocument.height.value + 0.15),
       AnchorPosition.MIDDLECENTER);
 
   app.backgroundColor.cmyk =  whiteColorObj;
