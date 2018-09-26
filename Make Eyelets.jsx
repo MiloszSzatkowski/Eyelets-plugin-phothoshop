@@ -452,26 +452,22 @@ var corners_weld = win.bottomGroup.add ("button",undefined, 'Only in the corners
 //bottom group amount - win.bottomGroup.add
 var info_desc = win.bottomGroup.add('statictext', undefined, 'Ilosci oczek - lista | Amount of eyelets - list')
 var gen_info = win.bottomGroup.add ('button', undefined, 'Generuj ilosci oczek | Generate amount of eyelets')
-var info_ = win.bottomGroup.add ("treeview",  undefined, 'Ilosci oczek - lista | Amount of eyelets - list:')
-info_.add('item', '_________');
-info_.add('item', '_________');
-info_.add('item', '_________');
-info_.add('item', '_________');
-info_.add('item', '_________');
-info_.add('item', '_________');
+var info_ = win.bottomGroup.add ("edittext",  undefined, '', {multiline: true});
+
+info_.minimumSize.height = 150;
 
 //  INFORMATION DROPDOWN
 function inform()  {
 
   try {
-    info_.removeAll();
+    info_.text = '';
   } catch (variable) {
     alert (variable);
   }
 
   var originActiveDoc = app.activeDocument;
 
-  var VAL = parseFloat(win.sliderPanel.te.text)
+  var VAL = parseFloat(win.sliderPanel.te.text);
 
   _accum = [];
 
@@ -482,10 +478,15 @@ function inform()  {
     var hh = app.activeDocument.height.value / VAL;
     ww = (Math.round(ww) + 1);
     hh = (Math.round(hh) + 1);
-    info_.add( 'item' ,  app.activeDocument.name);
-    info_.add( 'item' ,  'Horyzontalnie: ' + ww);
-    info_.add( 'item' ,  'Wertykalnie:   ' + hh);
-    info_.add('item', "--------------------------")
+
+    info_.text = info_.text + app.activeDocument.name;
+    info_.text = info_.text + '\n';
+    info_.text = info_.text + 'Horyzontalnie: ' + ww;
+    info_.text = info_.text + '\n';
+    info_.text = info_.text + 'Wertykalnie:   ' + hh;
+    info_.text = info_.text + '\n';
+    info_.text = info_.text + "--------------------------";
+    info_.text = info_.text + '\n';
 
   }
 
